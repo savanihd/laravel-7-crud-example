@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: laravel-crud
+  namespace: prd
+  labels:
+    app: laravel-crud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: laravel-crud
+  template:
+    metadata:
+      labels:
+        app: laravel-crud
+    spec:
+      volumes:
+        - name: shared-files
+          emptyDir: {}
+        - name: nginx-config-volume
+          configMap:
+            name: nginx-config
+        - name: app-env
+          configMap:
+            name: laravel-crud-env
+      containers:
+        - image: parsaeian/laravel-crud:latest
+          imagePullPolicy: Always
+          name: app
+          volumeMounts:
+            - name: shared-files
+              mountPath: /var/www/html
+            - name: app-env
+              mountPath: /tmp/public/.env
+              subPath: .env
+        - image: nginx
+          name: nginx
+          volumeMounts:
+            - name: shared-files
+              mountPath: /var/www/html
+            - name: nginx-config-volume
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+
