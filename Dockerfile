@@ -19,3 +19,9 @@ RUN composer install \
 FROM parsaeian/php-base
 COPY . /tmp/public/
 COPY --from=composer /app/vendor/ /tmp/public/vendor/
+
+COPY ./entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT [ "/entrypoint.sh" ]
+
+EXPOSE 9000
